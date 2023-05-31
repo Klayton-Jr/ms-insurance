@@ -23,7 +23,7 @@ public class CarDrivers {
     @JoinColumn(name = "driver_id")
     private Drivers drivers;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "car_id")
     private Cars cars;
 
