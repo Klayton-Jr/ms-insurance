@@ -1,11 +1,16 @@
 package com.audsat.msinsurance.controller;
 
+import com.audsat.msinsurance.service.InsuranceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/insurance")
+@RequiredArgsConstructor
 public class InsuranceController {
+
+    private final InsuranceService insuranceService;
 
     @PostMapping("/budget")
     public ResponseEntity<Void> createBudget() {
