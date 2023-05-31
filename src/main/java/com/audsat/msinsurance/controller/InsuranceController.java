@@ -22,7 +22,7 @@ public class InsuranceController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResponseWrapper.builder()
                         .code(HttpStatus.CREATED.value())
-                        .message("Sucess")
+                        .message("Success")
                         .budget(insuranceService.createInsurance(budgetRequest))
                 .build());
     }
