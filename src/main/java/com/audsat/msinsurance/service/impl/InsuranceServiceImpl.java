@@ -1,5 +1,7 @@
 package com.audsat.msinsurance.service.impl;
 
+import com.audsat.msinsurance.dto.BudgetDTO;
+import com.audsat.msinsurance.dto.CarDTO;
 import com.audsat.msinsurance.dto.request.NewBudegetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
@@ -9,6 +11,7 @@ import com.audsat.msinsurance.service.InsuranceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -17,9 +20,41 @@ import java.util.Optional;
 public class InsuranceServiceImpl implements InsuranceService {
     private final CarsRepository carsRepository;
     @Override
-    public void createInsurance(NewBudegetRequest budegetRequest) {
+    public BudgetDTO createInsurance(NewBudegetRequest budegetRequest) {
         validate(budegetRequest);
         Cars cars = getCarById(budegetRequest.getCarId());
+
+        BigDecimal insuranceAmount = calculateInsuranceAmount(budegetRequest, cars.getFipeValue());
+
+        BudgetDTO budgetDTO = BudgetDTO.builder()
+                .car(CarDTO.of(cars))
+                .mainDriverName(budegetRequest.getMainDriverDocument())
+                .mainDriverDocument(budegetRequest.getMainDriverDocument())
+                .otherDrivers(budegetRequest.getDrivers())
+                .value(insuranceAmount)
+                .build();
+
+        return budgetDTO;
+    }
+
+    private BigDecimal calculateInsuranceAmount(NewBudegetRequest budegetRequest, BigDecimal fipeValueCar) {
+        Integer percentageRisk = 6;
+        calculateIfNewDriver(budegetRequest.getMainDriverBirthDate(), percentageRisk);
+        calculateIfMainDriverHaveClaim(budegetRequest.getMainDriverDocument(), percentageRisk);
+        calculateIfCarHaveClaim(budegetRequest.getCarId(), percentageRisk);
+        return fipeValueCar.multiply(BigDecimal.valueOf((double) percentageRisk / 100));
+    }
+
+    private void calculateIfNewDriver(LocalDate mainDriverBirthDate, Integer percentageRisk) {
+
+    }
+
+    private void calculateIfMainDriverHaveClaim(String mainDriverBirthDate, Integer percentageRisk) {
+
+    }
+
+    private void calculateIfCarHaveClaim(Long carId, Integer percentageRisk) {
+
     }
 
     private void validate(NewBudegetRequest budegetRequest) {
