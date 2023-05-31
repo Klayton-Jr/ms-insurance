@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class NewBudegetRequest {
+public class NewBudgetRequest {
     private String customerName;
     private String mainDriverDocument;
     @PastOrPresent

@@ -1,6 +1,6 @@
 package com.audsat.msinsurance.controller;
 
-import com.audsat.msinsurance.dto.request.NewBudegetRequest;
+import com.audsat.msinsurance.dto.request.NewBudgetRequest;
 import com.audsat.msinsurance.dto.response.ResponseWrapper;
 import com.audsat.msinsurance.service.InsuranceService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,8 @@ public class InsuranceController {
     private final InsuranceService insuranceService;
 
     @PostMapping(value = "/budget", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseWrapper> createBudget(@RequestBody NewBudegetRequest budegetRequest) {
-        insuranceService.createInsurance(budegetRequest);
+    public ResponseEntity<ResponseWrapper> createBudget(@RequestBody NewBudgetRequest budgetRequest) {
+        insuranceService.createInsurance(budgetRequest);
         return ResponseEntity.ok().body(ResponseWrapper.builder()
                         .code(HttpStatus.CREATED.value())
                         .message("Sucess")

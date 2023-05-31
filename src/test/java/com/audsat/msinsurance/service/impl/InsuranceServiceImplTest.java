@@ -1,7 +1,7 @@
 package com.audsat.msinsurance.service.impl;
 
 import com.audsat.msinsurance.dto.DriverDTO;
-import com.audsat.msinsurance.dto.request.NewBudegetRequest;
+import com.audsat.msinsurance.dto.request.NewBudgetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
 import com.audsat.msinsurance.model.Cars;
@@ -34,7 +34,7 @@ class InsuranceServiceImplTest {
     @Test
     @DisplayName("Return CarNotFoundException if carId didn't return any record")
     void createInsuranceWithNoCar() {
-        NewBudegetRequest budegetRequest = NewBudegetRequest.builder()
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
                 .carId(0L)
                 .customerName("Custom customer name")
                 .mainDriverDocument("CNH-123")
@@ -44,14 +44,14 @@ class InsuranceServiceImplTest {
                         .driverName("other driver name")
                         .build()))
                 .build();
-        when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.empty());
-        assertThrows(CarNotFoundException.class, () -> insuranceService.createInsurance(budegetRequest));
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.empty());
+        assertThrows(CarNotFoundException.class, () -> insuranceService.createInsurance(budgetRequest));
     }
 
     @Test
     @DisplayName("Return MinorCustomerException if main driver is minor")
     void createInsuranceWithMainMinorDriver() {
-        NewBudegetRequest budegetRequest = NewBudegetRequest.builder()
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
                 .carId(1L)
                 .customerName("Custom customer name")
                 .mainDriverDocument("CNH-123")
@@ -61,13 +61,13 @@ class InsuranceServiceImplTest {
                                 .driverName("other driver name")
                         .build()))
                 .build();
-        assertThrows(MinorCustomerException.class, () -> insuranceService.createInsurance(budegetRequest));
+        assertThrows(MinorCustomerException.class, () -> insuranceService.createInsurance(budgetRequest));
     }
 
     @Test
     @DisplayName("Return MinorCustomerException if another driver is minor")
     void createInsuranceWithAnotherMinorDriver() {
-        NewBudegetRequest budegetRequest = NewBudegetRequest.builder()
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
                 .carId(1L)
                 .customerName("Custom customer name")
                 .mainDriverDocument("CNH-123")
@@ -77,13 +77,13 @@ class InsuranceServiceImplTest {
                         .driverName("other driver name")
                         .build()))
                 .build();
-        assertThrows(MinorCustomerException.class, () -> insuranceService.createInsurance(budegetRequest));
+        assertThrows(MinorCustomerException.class, () -> insuranceService.createInsurance(budgetRequest));
     }
 
     @Test
     @DisplayName("Return minimum budget percentage")
     void createInsuranceWithNoRiskMainDriver() {
-        NewBudegetRequest budegetRequest = NewBudegetRequest.builder()
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
                 .carId(1L)
                 .customerName("Custom customer name")
                 .mainDriverDocument("CNH-123")
@@ -94,16 +94,16 @@ class InsuranceServiceImplTest {
                         .build()))
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
-        when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.06));
 
-        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budegetRequest).getValue());
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
     }
 
     @Test
     @DisplayName("Return budget percentage with only new driver risk")
     void createInsuranceWithNewDriverRiskOnly() {
-        NewBudegetRequest budegetRequest = NewBudegetRequest.builder()
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
                 .carId(1L)
                 .customerName("Custom customer name")
                 .mainDriverDocument("CNH-123")
@@ -114,10 +114,10 @@ class InsuranceServiceImplTest {
                         .build()))
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
-        when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
 
-        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budegetRequest).getValue());
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
     }
 
     @Test
