@@ -24,5 +24,5 @@ public class Customer {
     private Drivers drivers;
 
     @OneToMany(mappedBy = "customer")
-    private List<Insurances> insurances;
+    private List<Insurances> insurancesList;
 }

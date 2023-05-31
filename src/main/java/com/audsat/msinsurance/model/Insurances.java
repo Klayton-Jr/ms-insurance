@@ -29,6 +29,10 @@ public class Insurances {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "car_id")
+    private Cars cars;
+
     @Column(name = "is_active")
     private Boolean active;
 }

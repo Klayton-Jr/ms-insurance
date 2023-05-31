@@ -29,5 +29,5 @@ public class Drivers {
     private Customer customer;
 
     @OneToMany(mappedBy = "drivers")
-    private List<CarDrivers> carDrivers;
+    private List<CarDrivers> carDriversList;
 }

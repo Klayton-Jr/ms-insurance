@@ -19,13 +19,13 @@ public class Claims {
     @Id
     private Long id;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "car_id")
-    private List<Cars> cars;
+    private Cars cars;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "driver_id")
-    private List<CarDrivers> carDrivers;
+    private CarDrivers carDrivers;
 
     @Column
     private LocalDate eventDate;

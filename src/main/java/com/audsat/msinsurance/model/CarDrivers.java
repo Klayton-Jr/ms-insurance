@@ -28,4 +28,7 @@ public class CarDrivers {
 
     @Column(name = "is_main_driver")
     private Boolean mainDriver;
+
+    @OneToMany(mappedBy = "carDrivers")
+    private List<Claims> claimsList;
 }

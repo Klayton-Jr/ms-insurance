@@ -1,15 +1,13 @@
 package com.audsat.msinsurance.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "cars")
@@ -32,4 +30,10 @@ public class Cars {
 
     @Column
     private BigDecimal fipeValue;
+
+    @OneToMany(mappedBy = "cars")
+    private List<Claims> claimsList;
+
+    @OneToMany(mappedBy = "cars")
+    private List<Insurances> insurancesList;
 }
