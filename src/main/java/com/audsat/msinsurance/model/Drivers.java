@@ -23,7 +23,7 @@ public class Drivers {
     @Column
     private LocalDate birthdate;
 
-    @OneToOne(mappedBy = "drivers")
+    @OneToOne(mappedBy = "drivers", cascade = CascadeType.ALL)
     @Setter
     private Customer customer;
 

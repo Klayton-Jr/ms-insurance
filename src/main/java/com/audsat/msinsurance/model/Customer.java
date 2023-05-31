@@ -20,8 +20,8 @@ public class Customer {
     @Setter
     private String name;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "driver_id", nullable = false)
     private Drivers drivers;
 
     @OneToMany(mappedBy = "customer")
