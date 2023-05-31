@@ -1,5 +1,6 @@
 package com.audsat.msinsurance.controller;
 
+import com.audsat.msinsurance.dto.request.NewBudegetRequest;
 import com.audsat.msinsurance.service.InsuranceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,8 @@ public class InsuranceController {
     private final InsuranceService insuranceService;
 
     @PostMapping("/budget")
-    public ResponseEntity<Void> createBudget() {
+    public ResponseEntity<Void> createBudget(@RequestBody NewBudegetRequest budegetRequest) {
+        insuranceService.createInsurance(budegetRequest);
         return null;
     }
 
