@@ -15,7 +15,7 @@ import java.util.List;
 public class NewBudgetRequest {
     private String customerName;
     private String mainDriverDocument;
-    @PastOrPresent
+    @PastOrPresent(message = "Data de nascimento do motorista principal não pode ser maior que a atual")
     private LocalDate mainDriverBirthDate;
     private Long carId;
     private List<DriverDTO> drivers;
