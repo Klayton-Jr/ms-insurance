@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -98,7 +99,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
-        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.06));
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.06)).setScale(2, RoundingMode.HALF_UP);;
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
     }
@@ -118,7 +119,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
-        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08)).setScale(2, RoundingMode.HALF_UP);;
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
     }
@@ -139,7 +140,7 @@ class InsuranceServiceImplTest {
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
         when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
-        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08)).setScale(2, RoundingMode.HALF_UP);;
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
     }
@@ -160,7 +161,52 @@ class InsuranceServiceImplTest {
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
         when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
-        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
+        when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
+
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
+    }
+
+    @Test
+    @DisplayName("Return budget percentage with car and driver with claims")
+    void createInsuranceWithCarAndDriverClaims() {
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
+                .carId(1L)
+                .customerName("Custom customer name")
+                .mainDriverDocument("CNH-123")
+                .mainDriverBirthDate(LocalDate.of(1996, 1, 1))
+                .drivers(List.of(DriverDTO.builder()
+                        .driverBirthDate(LocalDate.of(2005, 1, 1))
+                        .driverName("other driver name")
+                        .build()))
+                .build();
+        BigDecimal fipeValueCar = new BigDecimal(40000);
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
+        when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
+
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
+    }
+
+    @Test
+    @DisplayName("Return budget percentage with car and main driver with claims and new main driver")
+    void createInsuranceWithCarAndDriverClaimsAndNewMainDriver() {
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
+                .carId(1L)
+                .customerName("Custom customer name")
+                .mainDriverDocument("CNH-123")
+                .mainDriverBirthDate(LocalDate.of(2005, 1, 1))
+                .drivers(List.of(DriverDTO.builder()
+                        .driverBirthDate(LocalDate.of(1999, 1, 1))
+                        .driverName("other driver name")
+                        .build()))
+                .build();
+        BigDecimal fipeValueCar = new BigDecimal(40000);
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
+        when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.12)).setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
     }
