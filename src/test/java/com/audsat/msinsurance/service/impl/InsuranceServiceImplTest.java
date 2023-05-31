@@ -6,6 +6,7 @@ import com.audsat.msinsurance.exception.CarNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
 import com.audsat.msinsurance.model.Cars;
 import com.audsat.msinsurance.repository.CarsRepository;
+import com.audsat.msinsurance.repository.ClaimsRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,9 +28,11 @@ class InsuranceServiceImplTest {
 
     @InjectMocks
     InsuranceServiceImpl insuranceService;
-
     @Mock
     CarsRepository carsRepository;
+    @Mock
+    ClaimsRepository claimsRepository;
+
 
     @Test
     @DisplayName("Return CarNotFoundException if carId didn't return any record")
@@ -115,6 +118,27 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
+
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
+    }
+
+    @Test
+    @DisplayName("Return budget percentage with only driver with claims")
+    void createInsuranceWithDriverWithClaimsOnly() {
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
+                .carId(1L)
+                .customerName("Custom customer name")
+                .mainDriverDocument("CNH-123")
+                .mainDriverBirthDate(LocalDate.of(1996, 1, 1))
+                .drivers(List.of(DriverDTO.builder()
+                        .driverBirthDate(LocalDate.of(2005, 1, 1))
+                        .driverName("other driver name")
+                        .build()))
+                .build();
+        BigDecimal fipeValueCar = new BigDecimal(40000);
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());

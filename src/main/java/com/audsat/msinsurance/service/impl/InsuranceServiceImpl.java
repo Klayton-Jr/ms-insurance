@@ -7,6 +7,7 @@ import com.audsat.msinsurance.exception.CarNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
 import com.audsat.msinsurance.model.Cars;
 import com.audsat.msinsurance.repository.CarsRepository;
+import com.audsat.msinsurance.repository.ClaimsRepository;
 import com.audsat.msinsurance.service.InsuranceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class InsuranceServiceImpl implements InsuranceService {
     private final CarsRepository carsRepository;
+    private final ClaimsRepository claimsRepository;
     @Override
     public BudgetDTO createInsurance(NewBudgetRequest budgetRequest) {
         validate(budgetRequest);
@@ -52,11 +54,15 @@ public class InsuranceServiceImpl implements InsuranceService {
         return 0;
     }
 
-    private Integer calculateIfMainDriverHaveClaim(String mainDriverBirthDate) {
+    private Integer calculateIfMainDriverHaveClaim(String mainDriverDocument) {
+        if (claimsRepository.existsClaimByDriverDocument(mainDriverDocument))
+            return 2;
         return 0;
     }
 
     private Integer calculateIfCarHaveClaim(Long carId) {
+        if (claimsRepository.existsClaimsByCarId(carId))
+            return 2;
         return 0;
     }
 
