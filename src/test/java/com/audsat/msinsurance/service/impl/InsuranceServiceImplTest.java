@@ -87,7 +87,7 @@ class InsuranceServiceImplTest {
                 .carId(1L)
                 .customerName("Custom customer name")
                 .mainDriverDocument("CNH-123")
-                .mainDriverBirthDate(LocalDate.of(1999, 1, 1))
+                .mainDriverBirthDate(LocalDate.of(1980, 1, 1))
                 .drivers(List.of(DriverDTO.builder()
                         .driverBirthDate(LocalDate.of(1996, 1, 1))
                         .driverName("other driver name")
@@ -96,6 +96,26 @@ class InsuranceServiceImplTest {
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.06));
+
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budegetRequest).getValue());
+    }
+
+    @Test
+    @DisplayName("Return budget percentage with only new driver risk")
+    void createInsuranceWithNewDriverRiskOnly() {
+        NewBudegetRequest budegetRequest = NewBudegetRequest.builder()
+                .carId(1L)
+                .customerName("Custom customer name")
+                .mainDriverDocument("CNH-123")
+                .mainDriverBirthDate(LocalDate.of(2003, 1, 1))
+                .drivers(List.of(DriverDTO.builder()
+                        .driverBirthDate(LocalDate.of(1996, 1, 1))
+                        .driverName("other driver name")
+                        .build()))
+                .build();
+        BigDecimal fipeValueCar = new BigDecimal(40000);
+        when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budegetRequest).getValue());
     }

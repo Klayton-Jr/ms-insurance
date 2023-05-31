@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Optional;
 
 @Service
@@ -38,23 +39,25 @@ public class InsuranceServiceImpl implements InsuranceService {
     }
 
     private BigDecimal calculateInsuranceAmount(NewBudegetRequest budegetRequest, BigDecimal fipeValueCar) {
-        Integer percentageRisk = 6;
-        calculateIfNewDriver(budegetRequest.getMainDriverBirthDate(), percentageRisk);
-        calculateIfMainDriverHaveClaim(budegetRequest.getMainDriverDocument(), percentageRisk);
-        calculateIfCarHaveClaim(budegetRequest.getCarId(), percentageRisk);
+        int percentageRisk = 6;
+        percentageRisk += calculateIfNewDriver(budegetRequest.getMainDriverBirthDate());
+        percentageRisk += calculateIfMainDriverHaveClaim(budegetRequest.getMainDriverDocument());
+        percentageRisk += calculateIfCarHaveClaim(budegetRequest.getCarId());
         return fipeValueCar.multiply(BigDecimal.valueOf((double) percentageRisk / 100));
     }
 
-    private void calculateIfNewDriver(LocalDate mainDriverBirthDate, Integer percentageRisk) {
-
+    private Integer calculateIfNewDriver(LocalDate mainDriverBirthDate) {
+        if (Period.between(mainDriverBirthDate, LocalDate.now()).getYears() <= 25)
+            return 2;
+        return 0;
     }
 
-    private void calculateIfMainDriverHaveClaim(String mainDriverBirthDate, Integer percentageRisk) {
-
+    private Integer calculateIfMainDriverHaveClaim(String mainDriverBirthDate) {
+        return 0;
     }
 
-    private void calculateIfCarHaveClaim(Long carId, Integer percentageRisk) {
-
+    private Integer calculateIfCarHaveClaim(Long carId) {
+        return 0;
     }
 
     private void validate(NewBudegetRequest budegetRequest) {
