@@ -4,15 +4,13 @@ import com.audsat.msinsurance.dto.DriverDTO;
 import com.audsat.msinsurance.dto.request.NewBudegetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
-import com.audsat.msinsurance.model.Cars;
 import com.audsat.msinsurance.repository.CarsRepository;
-import com.audsat.msinsurance.service.InsuranceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,14 +19,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
 class InsuranceServiceImplTest {
 
-    @Autowired
-    InsuranceService insuranceService;
+    @InjectMocks
+    InsuranceServiceImpl insuranceService;
 
-    @MockBean
+    @Mock
     CarsRepository carsRepository;
 
     @Test
@@ -61,7 +58,6 @@ class InsuranceServiceImplTest {
                                 .driverName("other driver name")
                         .build()))
                 .build();
-        when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.of(new Cars()));
         assertThrows(MinorCustomerException.class, () -> insuranceService.createInsurance(budegetRequest));
     }
 
@@ -78,7 +74,6 @@ class InsuranceServiceImplTest {
                         .driverName("other driver name")
                         .build()))
                 .build();
-        when(carsRepository.findById(budegetRequest.getCarId())).thenReturn(Optional.of(new Cars()));
         assertThrows(MinorCustomerException.class, () -> insuranceService.createInsurance(budegetRequest));
     }
 
