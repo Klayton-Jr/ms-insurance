@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class InsuranceServiceImpl implements InsuranceService {
         percentageRisk += calculateIfNewDriver(budgetRequest.getMainDriverBirthDate());
         percentageRisk += calculateIfMainDriverHaveClaim(budgetRequest.getMainDriverDocument());
         percentageRisk += calculateIfCarHaveClaim(budgetRequest.getCarId());
-        return fipeValueCar.multiply(BigDecimal.valueOf((double) percentageRisk / 100));
+        return fipeValueCar.multiply(BigDecimal.valueOf((double) percentageRisk / 100)).setScale(2, RoundingMode.HALF_UP);
     }
 
     private Integer calculateIfNewDriver(LocalDate mainDriverBirthDate) {
