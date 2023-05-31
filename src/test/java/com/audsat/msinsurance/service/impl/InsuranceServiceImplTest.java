@@ -145,6 +145,27 @@ class InsuranceServiceImplTest {
     }
 
     @Test
+    @DisplayName("Return budget percentage with only car with claims")
+    void createInsuranceWithCarWithClaimsOnly() {
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
+                .carId(1L)
+                .customerName("Custom customer name")
+                .mainDriverDocument("CNH-123")
+                .mainDriverBirthDate(LocalDate.of(1996, 1, 1))
+                .drivers(List.of(DriverDTO.builder()
+                        .driverBirthDate(LocalDate.of(2005, 1, 1))
+                        .driverName("other driver name")
+                        .build()))
+                .build();
+        BigDecimal fipeValueCar = new BigDecimal(40000);
+        when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
+        BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08));
+
+        assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
+    }
+
+    @Test
     void updateInsurance() {
     }
 
