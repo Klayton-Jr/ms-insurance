@@ -3,10 +3,14 @@ package com.audsat.msinsurance.service.impl;
 import com.audsat.msinsurance.dto.DriverDTO;
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
+import com.audsat.msinsurance.exception.MainDriverNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
 import com.audsat.msinsurance.model.Cars;
+import com.audsat.msinsurance.model.Customer;
+import com.audsat.msinsurance.model.Drivers;
 import com.audsat.msinsurance.repository.CarsRepository;
 import com.audsat.msinsurance.repository.ClaimsRepository;
+import com.audsat.msinsurance.repository.DriversRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +37,8 @@ class InsuranceServiceImplTest {
     CarsRepository carsRepository;
     @Mock
     ClaimsRepository claimsRepository;
+    @Mock
+    DriversRepository driversRepository;
 
 
     @Test
@@ -49,6 +55,7 @@ class InsuranceServiceImplTest {
                         .build()))
                 .build();
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.empty());
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         assertThrows(CarNotFoundException.class, () -> insuranceService.createInsurance(budgetRequest));
     }
 
@@ -99,6 +106,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.06)).setScale(2, RoundingMode.HALF_UP);;
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
@@ -119,6 +127,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08)).setScale(2, RoundingMode.HALF_UP);;
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
@@ -139,6 +148,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.08)).setScale(2, RoundingMode.HALF_UP);;
 
@@ -160,6 +170,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
         when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
@@ -182,6 +193,7 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
         when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
@@ -204,11 +216,29 @@ class InsuranceServiceImplTest {
                 .build();
         BigDecimal fipeValueCar = new BigDecimal(40000);
         when(carsRepository.findById(budgetRequest.getCarId())).thenReturn(Optional.of(Cars.builder().fipeValue(fipeValueCar).build()));
+        when(driversRepository.findByDocument(budgetRequest.getMainDriverDocument())).thenReturn(Optional.of(Drivers.builder().customer(Customer.builder().name("name").build()).build()));
         when(claimsRepository.existsClaimsByCarId(budgetRequest.getCarId())).thenReturn(true);
         when(claimsRepository.existsClaimByDriverDocument(budgetRequest.getMainDriverDocument())).thenReturn(true);
         BigDecimal expectedBudgetAmount = fipeValueCar.multiply(BigDecimal.valueOf(0.12)).setScale(2, RoundingMode.HALF_UP);
 
         assertEquals(expectedBudgetAmount, insuranceService.createInsurance(budgetRequest).getValue());
+    }
+
+    @Test
+    @DisplayName("Return MainDriverNotFoundException if main driver does not exists")
+    void createInsuranceWithMainDriverNotExisting() {
+        NewBudgetRequest budgetRequest = NewBudgetRequest.builder()
+                .carId(1L)
+                .customerName("Custom customer name")
+                .mainDriverDocument("CNH-123")
+                .mainDriverBirthDate(LocalDate.of(2005, 1, 1))
+                .drivers(List.of(DriverDTO.builder()
+                        .driverBirthDate(LocalDate.of(1999, 1, 1))
+                        .driverName("other driver name")
+                        .build()))
+                .build();
+
+        assertThrows(MainDriverNotFoundException.class, () -> insuranceService.createInsurance(budgetRequest));
     }
 
     @Test
