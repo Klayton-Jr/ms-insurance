@@ -42,7 +42,7 @@ public class InsuranceAdvice {
 
     private Map<String, Object> getErrorsMap(List<String> errors) {
         Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("errors", errors);
+        errorResponse.put("errorMessages", errors);
         errorResponse.put("code", HttpStatus.BAD_REQUEST.value());
         return errorResponse;
     }
