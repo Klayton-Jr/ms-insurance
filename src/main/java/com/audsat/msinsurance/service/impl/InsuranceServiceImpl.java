@@ -8,6 +8,8 @@ import com.audsat.msinsurance.service.InsuranceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class InsuranceServiceImpl implements InsuranceService {
@@ -18,7 +20,10 @@ public class InsuranceServiceImpl implements InsuranceService {
     }
 
     private Cars getCarById(Long cardId) {
-        return carsRepository.findById(cardId).orElseThrow(() -> new CarNotFoundException(cardId));
+        Optional<Cars> carOptional = carsRepository.findById(cardId);
+        if (carOptional.isPresent())
+            return carOptional.get();
+        throw new CarNotFoundException(cardId);
     }
 
     @Override
