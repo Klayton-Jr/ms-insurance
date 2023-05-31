@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 public class Insurances {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

@@ -17,6 +17,7 @@ import java.util.List;
 @Getter
 public class Claims {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
