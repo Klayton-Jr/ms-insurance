@@ -4,10 +4,13 @@ import com.audsat.msinsurance.dto.BudgetDTO;
 import com.audsat.msinsurance.dto.CarDTO;
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
+import com.audsat.msinsurance.exception.MainDriverNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
 import com.audsat.msinsurance.model.Cars;
+import com.audsat.msinsurance.model.Drivers;
 import com.audsat.msinsurance.repository.CarsRepository;
 import com.audsat.msinsurance.repository.ClaimsRepository;
+import com.audsat.msinsurance.repository.DriversRepository;
 import com.audsat.msinsurance.service.InsuranceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import java.util.Optional;
 public class InsuranceServiceImpl implements InsuranceService {
     private final CarsRepository carsRepository;
     private final ClaimsRepository claimsRepository;
+    private final DriversRepository driversRepository;
     @Override
     public BudgetDTO createInsurance(NewBudgetRequest budgetRequest) {
         validate(budgetRequest);
@@ -36,6 +40,7 @@ public class InsuranceServiceImpl implements InsuranceService {
                 .mainDriverDocument(budgetRequest.getMainDriverDocument())
                 .otherDrivers(budgetRequest.getDrivers())
                 .value(insuranceAmount)
+                //.insuranceId()
                 .build();
 
         return budgetDTO;
@@ -69,6 +74,24 @@ public class InsuranceServiceImpl implements InsuranceService {
 
     private void validate(NewBudgetRequest budgetRequest) {
         validateDrivers(budgetRequest);
+        validateCustomerAndDrivers(budgetRequest);
+    }
+
+    private void validateCustomerAndDrivers(NewBudgetRequest budgetRequest) {
+        validateMainDriverAndUpdate(budgetRequest);
+//        saveOthersDriversIfNotExists();
+    }
+
+    private void validateMainDriverAndUpdate(NewBudgetRequest budgetRequest) {
+        Optional<Drivers> optionalMainDriver = driversRepository.findByDocument(budgetRequest.getMainDriverDocument());
+        if (optionalMainDriver.isEmpty())
+            throw new MainDriverNotFoundException(budgetRequest.getMainDriverDocument());
+
+        Drivers mainDriver = optionalMainDriver.get();
+        if (!mainDriver.getCustomer().getName().equalsIgnoreCase(budgetRequest.getCustomerName())) {
+            mainDriver.getCustomer().setName(budgetRequest.getCustomerName());
+            driversRepository.save(mainDriver);
+        }
     }
 
     private void validateDrivers(NewBudgetRequest budgetRequest) {
