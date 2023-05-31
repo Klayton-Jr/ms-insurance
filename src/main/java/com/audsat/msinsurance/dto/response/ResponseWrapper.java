@@ -9,5 +9,5 @@ import lombok.*;
 public class ResponseWrapper {
     private String message;
     private Integer code;
-    private Object insurance;
+    private Object budget;
 }
