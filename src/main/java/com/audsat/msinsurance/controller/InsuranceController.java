@@ -11,13 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/insurance")
+@RequestMapping(value = "/insurance", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class InsuranceController {
 
     private final InsuranceService insuranceService;
 
-    @PostMapping(value = "/budget", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/budget")
     public ResponseEntity<ResponseWrapper> createBudget(@Valid @RequestBody NewBudgetRequest budgetRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ResponseWrapper.builder()
@@ -28,8 +28,13 @@ public class InsuranceController {
     }
 
     @GetMapping("/budget/{insuranceId}")
-    public ResponseEntity<Void> returnBudget(@PathVariable("insuranceId") final String insuranceId) {
-        return null;
+    public ResponseEntity<ResponseWrapper> returnBudget(@PathVariable("insuranceId") final Long insuranceId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseWrapper.builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Success")
+                        .budget(insuranceService.returnInsurance(insuranceId))
+                        .build());
     }
 
     @PatchMapping("/budget/{insuranceId}")

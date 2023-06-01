@@ -5,6 +5,7 @@ import com.audsat.msinsurance.dto.CarDTO;
 import com.audsat.msinsurance.dto.DriverDTO;
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
+import com.audsat.msinsurance.exception.InsuranceNotFoundException;
 import com.audsat.msinsurance.exception.MainDriverNotFoundException;
 import com.audsat.msinsurance.exception.MinorCustomerException;
 import com.audsat.msinsurance.model.*;
@@ -28,6 +29,25 @@ public class InsuranceServiceImpl implements InsuranceService {
     private final DriversRepository driversRepository;
     private final CustomerRepository customerRepository;
     private final InsurancesRepository insurancesRepository;
+
+    @Override
+    public BudgetDTO returnInsurance(Long id) {
+        Optional<Insurances> optionalInsurance = insurancesRepository.findById(id);
+        if (optionalInsurance.isEmpty())
+            throw new InsuranceNotFoundException(id);
+        Insurances insurance = optionalInsurance.get();
+
+        return BudgetDTO.builder()
+                .car(CarDTO.of(insurance.getCars()))
+                .mainDriverName(insurance.getCustomer().getName())
+                .mainDriverDocument(insurance.getCustomer().getDrivers().getDocument())
+                .otherDrivers(
+                        insurance.getCars().getCarDriversList().stream().map(carDrivers -> DriverDTO.of(carDrivers.getDrivers())).toList()
+                )
+                .value(insurance.getAmount())
+                .insuranceId(insurance.getId())
+                .build();
+    }
 
     @Override
     public BudgetDTO createInsurance(NewBudgetRequest budgetRequest) {
