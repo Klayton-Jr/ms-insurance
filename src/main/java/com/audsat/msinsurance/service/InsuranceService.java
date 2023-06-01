@@ -8,6 +8,6 @@ public interface InsuranceService {
 
     BudgetDTO returnInsurance(Long id);
     BudgetDTO createInsurance(NewBudgetRequest budegetRequest);
-    BudgetDTO updateInsurance(UpdateBudgetRequest updateBudgetRequest);
-    void deleteInsurance();
+    BudgetDTO updateInsurance(Long id, UpdateBudgetRequest updateBudgetRequest);
+    void deleteInsurance(Long id);
 }

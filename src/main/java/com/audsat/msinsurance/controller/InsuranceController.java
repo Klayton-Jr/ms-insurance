@@ -1,6 +1,7 @@
 package com.audsat.msinsurance.controller;
 
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
+import com.audsat.msinsurance.dto.request.UpdateBudgetRequest;
 import com.audsat.msinsurance.dto.response.ResponseWrapper;
 import com.audsat.msinsurance.service.InsuranceService;
 import jakarta.validation.Valid;
@@ -38,13 +39,19 @@ public class InsuranceController {
     }
 
     @PatchMapping("/budget/{insuranceId}")
-    public ResponseEntity<Void> updateBudget(@PathVariable("insuranceId") final String insuranceId) {
-        return null;
+    public ResponseEntity<ResponseWrapper> updateBudget(@PathVariable("insuranceId") final Long insuranceId, @Valid @RequestBody UpdateBudgetRequest updateBudgetRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseWrapper.builder()
+                        .code(HttpStatus.OK.value())
+                        .message("Success")
+                        .budget(insuranceService.updateInsurance(insuranceId, updateBudgetRequest))
+                        .build());
     }
 
     @DeleteMapping("/budget/{insuranceId}")
-    public ResponseEntity<Void> deleteBudget(@PathVariable("insuranceId") final String insuranceId) {
-        return null;
+    public ResponseEntity<Void> deleteBudget(@PathVariable("insuranceId") final Long insuranceId) {
+        insuranceService.deleteInsurance(insuranceId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -35,6 +35,7 @@ public class Insurances {
     private Cars cars;
 
     @Column(name = "is_active")
+    @Setter
     private Boolean active;
 
     @Column

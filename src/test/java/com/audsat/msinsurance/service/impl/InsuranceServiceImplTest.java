@@ -2,6 +2,7 @@ package com.audsat.msinsurance.service.impl;
 
 import com.audsat.msinsurance.dto.DriverDTO;
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
+import com.audsat.msinsurance.dto.request.UpdateBudgetRequest;
 import com.audsat.msinsurance.exception.CarNotFoundException;
 import com.audsat.msinsurance.exception.InsuranceNotFoundException;
 import com.audsat.msinsurance.exception.MainDriverNotFoundException;
@@ -429,10 +430,14 @@ class InsuranceServiceImplTest {
     }
 
     @Test
-    void updateInsurance() {
+    @DisplayName("Return InsuranceNotFoundException if budget insuranceId does not exists")
+    void updateInsuranceWithInexistingInsuranceId() {
+        assertThrows(InsuranceNotFoundException.class, () -> insuranceService.updateInsurance(0L, any()));
     }
 
     @Test
-    void deleteInsurance() {
+    @DisplayName("Return InsuranceNotFoundException if budget insuranceId does not exists")
+    void deleteInsuranceWithInexistingInsuranceId() {
+        assertThrows(InsuranceNotFoundException.class, () -> insuranceService.deleteInsurance(0L));
     }
 }

@@ -1,6 +1,7 @@
 package com.audsat.msinsurance.dto.request;
 
 import com.audsat.msinsurance.dto.DriverDTO;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 
@@ -19,5 +20,6 @@ public class UpdateBudgetRequest {
     private LocalDate mainDriverBirthDate;
     private Long carId;
     private List<DriverDTO> drivers;
-    private boolean activate;
+    @NotNull(message = "É obrigatório informar se está ativando ou desativando o orçamento do seguro informado")
+    private String activate;
 }

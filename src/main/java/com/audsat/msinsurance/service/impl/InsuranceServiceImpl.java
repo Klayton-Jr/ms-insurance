@@ -30,12 +30,14 @@ public class InsuranceServiceImpl implements InsuranceService {
 
     @Override
     public BudgetDTO returnInsurance(Long id) {
+        return BudgetDTO.of(returnInsuranceById(id));
+    }
+
+    private Insurances returnInsuranceById(Long id) {
         Optional<Insurances> optionalInsurance = insurancesRepository.findById(id);
         if (optionalInsurance.isEmpty())
             throw new InsuranceNotFoundException(id);
-        Insurances insurance = optionalInsurance.get();
-
-        return BudgetDTO.of(insurance);
+        return optionalInsurance.get();
     }
 
     @Override
@@ -156,12 +158,16 @@ public class InsuranceServiceImpl implements InsuranceService {
     }
 
     @Override
-    public BudgetDTO updateInsurance(UpdateBudgetRequest updateBudgetRequest) {
-        return null;
+    public BudgetDTO updateInsurance(Long id, UpdateBudgetRequest updateBudgetRequest) {
+        Insurances insurances = returnInsuranceById(id);
+        insurances.setActive(Boolean.valueOf(updateBudgetRequest.getActivate()));
+        insurances = insurancesRepository.save(insurances);
+        return BudgetDTO.of(insurances);
     }
 
     @Override
-    public void deleteInsurance() {
-
+    public void deleteInsurance(Long id) {
+        Insurances insurances = returnInsuranceById(id);
+        insurancesRepository.delete(insurances);
     }
 }
