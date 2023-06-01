@@ -1,0 +1,11 @@
+FROM eclipse-temurin:17
+
+COPY . .
+
+CMD ["gradle clean build"]
+
+ENV ARTIFACT_NAME=/build/libs/ms-insurance-0.0.1-SNAPSHOT.jar
+
+EXPOSE 8080
+
+ENTRYPOINT exec java -jar $ARTIFACT_NAME
