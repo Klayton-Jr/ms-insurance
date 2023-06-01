@@ -20,7 +20,7 @@ public class Customer {
     @Setter
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "driver_id")
     private Drivers drivers;
 
