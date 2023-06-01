@@ -16,4 +16,5 @@ public class BudgetDTO {
     private CarDTO car;
     private List<DriverDTO> otherDrivers;
     private BigDecimal value;
+    private Long insuranceId;
 }

@@ -2,9 +2,9 @@ package com.audsat.msinsurance.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,12 +22,12 @@ public class Insurances {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @Column
-    @CreatedDate
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
     private LocalDateTime creationDt;
 
     @Column
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @ManyToOne
@@ -36,4 +36,7 @@ public class Insurances {
 
     @Column(name = "is_active")
     private Boolean active;
+
+    @Column
+    private BigDecimal amount;
 }
