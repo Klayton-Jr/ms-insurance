@@ -1,0 +1,7 @@
+version: "3"
+services:
+  ms-insurance:
+    build:
+      dockerfile: DOCKERFILE
+    ports:
+      - "8080:8080"
