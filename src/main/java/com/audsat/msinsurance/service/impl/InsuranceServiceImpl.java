@@ -3,11 +3,11 @@ package com.audsat.msinsurance.service.impl;
 import com.audsat.msinsurance.dto.BudgetDTO;
 import com.audsat.msinsurance.dto.DriverDTO;
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
+import com.audsat.msinsurance.dto.request.UpdateBudgetRequest;
 import com.audsat.msinsurance.exception.*;
 import com.audsat.msinsurance.model.*;
 import com.audsat.msinsurance.repository.*;
 import com.audsat.msinsurance.service.InsuranceService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +63,7 @@ public class InsuranceServiceImpl implements InsuranceService {
     private BudgetDTO saveNewInsuranceBudget(BigDecimal insuranceAmount, Cars car, Drivers mainDriver, Customer customer) {
         Insurances insurance = insurancesRepository.save(Insurances.builder()
                 .customer(customer)
-                .active(true)
+                .active(false)
                 .cars(car)
                 .amount(insuranceAmount)
                 .build());
@@ -113,23 +113,16 @@ public class InsuranceServiceImpl implements InsuranceService {
         });
     }
 
-    @Transactional
     public void saveNewNotMainDriversWithCarId(DriverDTO driverDTO, Cars car, Customer customer) {
 
-        Drivers drivers = driversRepository.save(Drivers.builder()
-                .birthdate(driverDTO.getDriverBirthDate())
-                .document(driverDTO.getDriverDocument())
-                .customer(List.of(customer))
-                .build());
-//
-//        Customer customer = customerRepository.save(Customer.builder()
-//                .name(driverDTO.getDriverName())
-//                .drivers(drivers)
-//                .build());
-        CarDrivers carDrivers = carDriversRepository.save(CarDrivers.builder()
+        carDriversRepository.save(CarDrivers.builder()
                 .cars(car)
                 .mainDriver(false)
-                .drivers(drivers)
+                .drivers(Drivers.builder()
+                        .birthdate(driverDTO.getDriverBirthDate())
+                        .document(driverDTO.getDriverDocument())
+                        .customer(List.of(customer))
+                        .build())
                 .build());
     }
 
@@ -163,8 +156,8 @@ public class InsuranceServiceImpl implements InsuranceService {
     }
 
     @Override
-    public void updateInsurance() {
-
+    public BudgetDTO updateInsurance(UpdateBudgetRequest updateBudgetRequest) {
+        return null;
     }
 
     @Override

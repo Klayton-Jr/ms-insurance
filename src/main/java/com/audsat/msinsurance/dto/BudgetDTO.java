@@ -19,6 +19,7 @@ public class BudgetDTO {
     private CarDTO car;
     private List<DriverDTO> otherDrivers;
     private BigDecimal value;
+    private Boolean activated;
     private Long insuranceId;
 
     public static BudgetDTO of(Insurances insurance) {
@@ -37,6 +38,7 @@ public class BudgetDTO {
                                 .toList()
                 )
                 .value(insurance.getAmount())
+                .activated(insurance.getActive())
                 .insuranceId(insurance.getId())
                 .build();
     }
