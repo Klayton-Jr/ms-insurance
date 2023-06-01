@@ -103,7 +103,7 @@ values (true,
         (select id from DRIVERS where DOCUMENT = 'CNH-123456')
 );
 insert into CAR_DRIVERS (IS_MAIN_DRIVER, CAR_ID, DRIVER_ID)
-values (true,
+values (false,
         (select id from CARS where FIPE_VALUE = 35000.00 AND MANUFACTURER LIKE 'UP' AND CAR_YEAR LIKE '2015' AND MODEL LIKE 'FOX'),
         (select id from DRIVERS where DOCUMENT = 'CNH-20050123')
 );
@@ -115,7 +115,7 @@ values (true,
         (select id from DRIVERS where DOCUMENT = 'CNH-19800123')
 );
 insert into CAR_DRIVERS (IS_MAIN_DRIVER, CAR_ID, DRIVER_ID)
-values (true,
+values (false,
         (select id from CARS where FIPE_VALUE = 80000.00 AND MANUFACTURER LIKE 'ONIX' AND CAR_YEAR LIKE '2022' AND MODEL LIKE 'CHEVROLET'),
         (select id from DRIVERS where DOCUMENT = 'CNH-19950123')
 );
