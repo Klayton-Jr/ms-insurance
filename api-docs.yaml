@@ -1,0 +1,171 @@
+openapi: 3.0.1
+info:
+  title: MS Insurance
+  description: Description test
+  contact:
+    name: Klayton
+    email: klaytonjuniordev@gmail.com
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /insurance/budget:
+    post:
+      tags:
+      - insurance-controller
+      operationId: createBudget
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewBudgetRequest'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+  /insurance/budget/{insuranceId}:
+    get:
+      tags:
+      - insurance-controller
+      operationId: returnBudget
+      parameters:
+      - name: insuranceId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+    delete:
+      tags:
+      - insurance-controller
+      operationId: deleteBudget
+      parameters:
+      - name: insuranceId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+        "200":
+          description: OK
+    patch:
+      tags:
+      - insurance-controller
+      operationId: updateBudget
+      parameters:
+      - name: insuranceId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBudgetRequest'
+        required: true
+      responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseWrapper'
+components:
+  schemas:
+    ResponseWrapper:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: integer
+          format: int32
+        budget:
+          type: object
+    DriverDTO:
+      type: object
+      properties:
+        driverDocument:
+          type: string
+        driverBirthDate:
+          type: string
+          format: date
+    NewBudgetRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+        mainDriverDocument:
+          type: string
+        mainDriverBirthDate:
+          type: string
+          format: date
+        carId:
+          type: integer
+          format: int64
+        drivers:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriverDTO'
+    UpdateBudgetRequest:
+      required:
+      - activate
+      type: object
+      properties:
+        customerId:
+          type: integer
+          format: int64
+        mainDriverDocument:
+          type: string
+        mainDriverBirthDate:
+          type: string
+          format: date
+        carId:
+          type: integer
+          format: int64
+        drivers:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriverDTO'
+        activate:
+          type: string
