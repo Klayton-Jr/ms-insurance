@@ -1,10 +1,7 @@
 package com.audsat.msinsurance.advice;
 
 import com.audsat.msinsurance.dto.response.ResponseWrapper;
-import com.audsat.msinsurance.exception.CarNotFoundException;
-import com.audsat.msinsurance.exception.InsuranceNotFoundException;
-import com.audsat.msinsurance.exception.MainDriverNotFoundException;
-import com.audsat.msinsurance.exception.MinorCustomerException;
+import com.audsat.msinsurance.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +44,13 @@ public class InsuranceAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     ResponseWrapper handleInsuranceNotFoundException(InsuranceNotFoundException insuranceNotFoundException, WebRequest request) {
         return buildGenericErrorResponse(insuranceNotFoundException);
+    }
+
+    @ExceptionHandler(CustomerNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ResponseWrapper handleInsuranceNotFoundException(CustomerNotFoundException customerNotFoundException, WebRequest request) {
+        return buildGenericErrorResponse(customerNotFoundException);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

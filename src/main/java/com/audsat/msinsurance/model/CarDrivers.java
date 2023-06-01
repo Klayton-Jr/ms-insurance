@@ -19,11 +19,11 @@ public class CarDrivers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "driver_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "driver_id", nullable = false)
     private Drivers drivers;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "car_id")
     private Cars cars;
 

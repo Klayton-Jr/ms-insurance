@@ -23,10 +23,9 @@ public class Drivers {
     @Column
     private LocalDate birthdate;
 
-    @OneToOne(mappedBy = "drivers", cascade = CascadeType.ALL)
-    @Setter
-    private Customer customer;
+    @OneToMany(mappedBy = "drivers", cascade = CascadeType.ALL)
+    private List<Customer> customer;
 
-    @OneToMany(mappedBy = "drivers")
+    @OneToMany(mappedBy = "drivers", cascade = CascadeType.ALL)
     private List<CarDrivers> carDriversList;
 }

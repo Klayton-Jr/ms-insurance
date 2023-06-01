@@ -35,9 +35,9 @@ public class Cars {
     @OneToMany(mappedBy = "cars")
     private List<Claims> claimsList;
 
-    @OneToMany(mappedBy = "cars")
+    @OneToMany(mappedBy = "cars", cascade = CascadeType.ALL)
     private List<Insurances> insurancesList;
 
-    @OneToMany(mappedBy = "cars")
+    @OneToMany(mappedBy = "cars", cascade = CascadeType.ALL)
     private List<CarDrivers> carDriversList;
 }

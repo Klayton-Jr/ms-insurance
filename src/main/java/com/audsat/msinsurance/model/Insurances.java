@@ -18,7 +18,7 @@ public class Insurances {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
@@ -30,7 +30,7 @@ public class Insurances {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "car_id")
     private Cars cars;
 

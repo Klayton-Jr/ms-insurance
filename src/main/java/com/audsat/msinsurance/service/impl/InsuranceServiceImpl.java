@@ -1,16 +1,13 @@
 package com.audsat.msinsurance.service.impl;
 
 import com.audsat.msinsurance.dto.BudgetDTO;
-import com.audsat.msinsurance.dto.CarDTO;
 import com.audsat.msinsurance.dto.DriverDTO;
 import com.audsat.msinsurance.dto.request.NewBudgetRequest;
-import com.audsat.msinsurance.exception.CarNotFoundException;
-import com.audsat.msinsurance.exception.InsuranceNotFoundException;
-import com.audsat.msinsurance.exception.MainDriverNotFoundException;
-import com.audsat.msinsurance.exception.MinorCustomerException;
+import com.audsat.msinsurance.exception.*;
 import com.audsat.msinsurance.model.*;
 import com.audsat.msinsurance.repository.*;
 import com.audsat.msinsurance.service.InsuranceService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +26,7 @@ public class InsuranceServiceImpl implements InsuranceService {
     private final DriversRepository driversRepository;
     private final CustomerRepository customerRepository;
     private final InsurancesRepository insurancesRepository;
+    private final CarDriversRepository carDriversRepository;
 
     @Override
     public BudgetDTO returnInsurance(Long id) {
@@ -37,48 +35,40 @@ public class InsuranceServiceImpl implements InsuranceService {
             throw new InsuranceNotFoundException(id);
         Insurances insurance = optionalInsurance.get();
 
-        return BudgetDTO.builder()
-                .car(CarDTO.of(insurance.getCars()))
-                .mainDriverName(insurance.getCustomer().getName())
-                .mainDriverDocument(insurance.getCustomer().getDrivers().getDocument())
-                .otherDrivers(
-                        insurance.getCars().getCarDriversList().stream().map(carDrivers -> DriverDTO.of(carDrivers.getDrivers())).toList()
-                )
-                .value(insurance.getAmount())
-                .insuranceId(insurance.getId())
-                .build();
+        return BudgetDTO.of(insurance);
     }
 
     @Override
     public BudgetDTO createInsurance(NewBudgetRequest budgetRequest) {
         validate(budgetRequest);
 
+        Customer customer = getCustomerById(budgetRequest.getCustomerId());
         Cars car = getCarById(budgetRequest.getCarId());
         Drivers mainDriver = validateCustomerAndMainDriver(budgetRequest);
 
-        saveOthersDriversIfNotExists(budgetRequest.getDrivers(), car);
+        saveOthersDriversIfNotExists(budgetRequest.getDrivers(), car, customer);
         BigDecimal insuranceAmount = calculateInsuranceAmount(budgetRequest, car.getFipeValue());
 
 
-        return saveNewInsuranceBudget(budgetRequest, insuranceAmount, car, mainDriver);
+        return saveNewInsuranceBudget(insuranceAmount, car, mainDriver, customer);
     }
 
-    private BudgetDTO saveNewInsuranceBudget(NewBudgetRequest budgetRequest, BigDecimal insuranceAmount, Cars car, Drivers mainDriver) {
-        Insurances insurances = insurancesRepository.save(Insurances.builder()
-                .customer(mainDriver.getCustomer())
+    private Customer getCustomerById(Long id) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isEmpty())
+            throw new CustomerNotFoundException(id);
+        return optionalCustomer.get();
+    }
+
+    private BudgetDTO saveNewInsuranceBudget(BigDecimal insuranceAmount, Cars car, Drivers mainDriver, Customer customer) {
+        Insurances insurance = insurancesRepository.save(Insurances.builder()
+                .customer(customer)
                 .active(true)
                 .cars(car)
                 .amount(insuranceAmount)
                 .build());
 
-        return BudgetDTO.builder()
-                .car(CarDTO.of(car))
-                .mainDriverName(budgetRequest.getCustomerName())
-                .mainDriverDocument(budgetRequest.getMainDriverDocument())
-                .otherDrivers(budgetRequest.getDrivers())
-                .value(insuranceAmount)
-                .insuranceId(insurances.getId())
-                .build();
+        return BudgetDTO.of(insurance);
     }
 
     private BigDecimal calculateInsuranceAmount(NewBudgetRequest budgetRequest, BigDecimal fipeValueCar) {
@@ -115,22 +105,31 @@ public class InsuranceServiceImpl implements InsuranceService {
         return validateMainDriverAndUpdate(budgetRequest);
     }
 
-    private void saveOthersDriversIfNotExists(List<DriverDTO> driverDTOList, Cars car) {
-        driverDTOList.forEach(driverDTO -> saveNewNotMainDriversWithCarId(driverDTO, car));
+    private void saveOthersDriversIfNotExists(List<DriverDTO> driverDTOList, Cars car, Customer customer) {
+        driverDTOList.forEach(driverDTO -> {
+            if (driversRepository.existsDriverByDocumentAndBirthDateAndCarAntNotMainDriver(driverDTO.getDriverDocument(), driverDTO.getDriverBirthDate(), car.getId()))
+                return;
+            saveNewNotMainDriversWithCarId(driverDTO, car, customer);
+        });
     }
 
-    private void saveNewNotMainDriversWithCarId(DriverDTO driverDTO, Cars car) {
-        customerRepository.save(Customer.builder()
-                .name(driverDTO.getDriverName())
-                .drivers(Drivers.builder()
-                        .birthdate(driverDTO.getDriverBirthDate())
-                        .document(driverDTO.getDriverDocument())
-                        .carDriversList(
-                                List.of(CarDrivers.builder()
-                                        .cars(car)
-                                        .mainDriver(false)
-                                        .build()))
-                        .build())
+    @Transactional
+    public void saveNewNotMainDriversWithCarId(DriverDTO driverDTO, Cars car, Customer customer) {
+
+        Drivers drivers = driversRepository.save(Drivers.builder()
+                .birthdate(driverDTO.getDriverBirthDate())
+                .document(driverDTO.getDriverDocument())
+                .customer(List.of(customer))
+                .build());
+//
+//        Customer customer = customerRepository.save(Customer.builder()
+//                .name(driverDTO.getDriverName())
+//                .drivers(drivers)
+//                .build());
+        CarDrivers carDrivers = carDriversRepository.save(CarDrivers.builder()
+                .cars(car)
+                .mainDriver(false)
+                .drivers(drivers)
                 .build());
     }
 
@@ -139,22 +138,17 @@ public class InsuranceServiceImpl implements InsuranceService {
         if (optionalMainDriver.isEmpty())
             throw new MainDriverNotFoundException(budgetRequest.getMainDriverDocument());
 
-        Drivers mainDriver = optionalMainDriver.get();
-        if (!mainDriver.getCustomer().getName().equalsIgnoreCase(budgetRequest.getCustomerName())) {
-            mainDriver.getCustomer().setName(budgetRequest.getCustomerName());
-            driversRepository.save(mainDriver);
-        }
-        return mainDriver;
+        return optionalMainDriver.get();
     }
 
     private void validateDrivers(NewBudgetRequest budgetRequest) {
-        validateIfMinor(budgetRequest.getMainDriverBirthDate(), budgetRequest.getCustomerName());
-        budgetRequest.getDrivers().forEach(driver -> validateIfMinor(driver.getDriverBirthDate(), driver.getDriverName()));
+        validateIfMinor(budgetRequest.getMainDriverBirthDate(), budgetRequest.getMainDriverDocument());
+        budgetRequest.getDrivers().forEach(driver -> validateIfMinor(driver.getDriverBirthDate(), driver.getDriverDocument()));
     }
 
-    private void validateIfMinor(LocalDate birthDate, String name) {
+    private void validateIfMinor(LocalDate birthDate, String document) {
         if (birthDate != null && isMinor(birthDate))
-            throw new MinorCustomerException(name);
+            throw new MinorCustomerException(document);
     }
 
     private boolean isMinor(LocalDate birthDate) {

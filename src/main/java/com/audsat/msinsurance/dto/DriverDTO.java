@@ -11,13 +11,11 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class DriverDTO {
-    private String driverName;
     private String driverDocument;
     private LocalDate driverBirthDate;
 
     public static DriverDTO of(Drivers drivers) {
         return DriverDTO.builder()
-                .driverName(drivers.getCustomer().getName())
                 .driverDocument(drivers.getDocument())
                 .driverBirthDate(drivers.getBirthdate())
                 .build();

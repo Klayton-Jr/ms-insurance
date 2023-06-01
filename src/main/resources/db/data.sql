@@ -53,32 +53,32 @@ values ((select id from DRIVERS where DOCUMENT = 'CNH-20030123'), 'Nala');
 insert into DRIVERS (BIRTHDATE, DOCUMENT)
 values (DATE '2005-01-23', 'CNH-20050123');
 
-insert into CUSTOMER (DRIVER_ID, NAME)
-values ((select id from DRIVERS where DOCUMENT = 'CNH-20050123'), 'Belinha');
+-- insert into CUSTOMER (DRIVER_ID, NAME)
+-- values ((select id from DRIVERS where DOCUMENT = 'CNH-20050123'), 'Belinha');
 
 insert into DRIVERS (BIRTHDATE, DOCUMENT)
 values (DATE '1999-01-23', 'CNH-19990123');
 
-insert into CUSTOMER (DRIVER_ID, NAME)
-values ((select id from DRIVERS where DOCUMENT = 'CNH-19990123'), 'Kiara');
+-- insert into CUSTOMER (DRIVER_ID, NAME)
+-- values ((select id from DRIVERS where DOCUMENT = 'CNH-19990123'), 'Kiara');
 
 insert into DRIVERS (BIRTHDATE, DOCUMENT)
 values (DATE '1980-01-23', 'CNH-19800123');
 
-insert into CUSTOMER (DRIVER_ID, NAME)
-values ((select id from DRIVERS where DOCUMENT = 'CNH-19800123'), 'Mufasa');
+-- insert into CUSTOMER (DRIVER_ID, NAME)
+-- values ((select id from DRIVERS where DOCUMENT = 'CNH-19800123'), 'Mufasa');
 
 insert into DRIVERS (BIRTHDATE, DOCUMENT)
 values (DATE '1990-01-23', 'CNH-19900123');
 
-insert into CUSTOMER (DRIVER_ID, NAME)
-values ((select id from DRIVERS where DOCUMENT = 'CNH-19900123'), 'Simba');
+-- insert into CUSTOMER (DRIVER_ID, NAME)
+-- values ((select id from DRIVERS where DOCUMENT = 'CNH-19900123'), 'Simba');
 
 insert into DRIVERS (BIRTHDATE, DOCUMENT)
 values (DATE '1995-01-23', 'CNH-19950123');
 
-insert into CUSTOMER (DRIVER_ID, NAME)
-values ((select id from DRIVERS where DOCUMENT = 'CNH-19950123'), 'Scar');
+-- insert into CUSTOMER (DRIVER_ID, NAME)
+-- values ((select id from DRIVERS where DOCUMENT = 'CNH-19950123'), 'Scar');
 
 -------------------------------------------------------------16
 
