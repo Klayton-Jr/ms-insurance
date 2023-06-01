@@ -35,7 +35,7 @@ public class Cars {
     @OneToMany(mappedBy = "cars")
     private List<Claims> claimsList;
 
-    @OneToMany(mappedBy = "cars", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cars", cascade = CascadeType.PERSIST)
     private List<Insurances> insurancesList;
 
     @OneToMany(mappedBy = "cars", cascade = CascadeType.ALL)
